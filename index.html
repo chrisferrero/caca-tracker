@@ -28,16 +28,20 @@
   </div>
 
   <div class="app">
+    <!-- ======================= NAVIGATION (en haut) ======================= -->
+    <nav class="tabbar" aria-label="Navigation principale">
+      <button class="tab is-active" data-view="today" type="button">
+        <span class="tab-icon">🏠</span>
+        <span class="tab-label">Aujourd'hui</span>
+      </button>
+      <button class="tab" data-view="history" type="button">
+        <span class="tab-icon">📅</span>
+        <span class="tab-label">Historique</span>
+      </button>
+    </nav>
+
     <!-- ======================= AUJOURD'HUI ======================= -->
     <main id="view-today" class="view" aria-label="Aujourd'hui">
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark">🐕</span>
-          <span class="brand-name">Journal du chien</span>
-        </div>
-        <span class="label topbar-date" id="topbar-date">—</span>
-      </header>
-
       <!-- HERO : l'info la plus importante (statut + compteur du jour) -->
       <section class="card hero" id="status-card">
         <p class="label hero-label" id="hero-label">AUJOURD'HUI</p>
@@ -51,12 +55,6 @@
           </div>
         </div>
       </section>
-
-      <!-- CTA principal -->
-      <button id="btn-add" class="cta" type="button">
-        <span class="cta-emoji">💩</span>
-        <span>Caca fait</span>
-      </button>
 
       <!-- Actions secondaires -->
       <div class="today-actions">
@@ -82,13 +80,6 @@
 
     <!-- ======================= HISTORIQUE ======================= -->
     <main id="view-history" class="view" aria-label="Historique" hidden>
-      <header class="topbar">
-        <div class="brand">
-          <span class="brand-mark">📅</span>
-          <span class="brand-name">Historique</span>
-        </div>
-      </header>
-
       <div class="cal-nav">
         <button id="cal-prev" class="cal-arrow" type="button" aria-label="Mois précédent">‹</button>
         <span id="cal-month" class="cal-month">—</span>
@@ -106,19 +97,13 @@
         <p class="cal-stats-sub" id="stats-sub"></p>
       </div>
     </main>
-
-    <!-- ======================= NAVIGATION ======================= -->
-    <nav class="tabbar" aria-label="Navigation principale">
-      <button class="tab is-active" data-view="today" type="button">
-        <span class="tab-icon">🏠</span>
-        <span class="tab-label">Aujourd'hui</span>
-      </button>
-      <button class="tab" data-view="history" type="button">
-        <span class="tab-icon">📅</span>
-        <span class="tab-label">Historique</span>
-      </button>
-    </nav>
   </div>
+
+  <!-- CTA principal, fixe en bas (visible seulement sur la vue Aujourd'hui) -->
+  <button id="btn-add" class="cta" type="button">
+    <span class="cta-emoji">💩</span>
+    <span>Caca fait</span>
+  </button>
 
   <script type="module" src="js/app.js"></script>
 </body>

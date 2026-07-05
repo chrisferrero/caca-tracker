@@ -13,7 +13,6 @@ import {
 import {
   dateKey,
   formatLongDate,
-  formatShortDate,
   formatTime,
   monthLabel,
   monthGrid,
@@ -22,7 +21,6 @@ import {
 
 // --- Références DOM ---
 const el = {
-  topbarDate: document.getElementById('topbar-date'),
   statusCard: document.getElementById('status-card'),
   heroLabel: document.getElementById('hero-label'),
   heroRing: document.getElementById('hero-ring'),
@@ -53,7 +51,6 @@ let currentDayKey = dateKey();
 // --- Rendu de la vue « Aujourd'hui » ---
 function renderToday() {
   currentDayKey = dateKey();
-  el.topbarDate.textContent = formatShortDate();
   el.heroLabel.textContent = `AUJOURD'HUI · ${formatLongDate().toUpperCase()}`;
 
   const todays = getEventsForDay();
@@ -169,6 +166,7 @@ function switchView(view) {
   const isToday = view === 'today';
   el.viewToday.hidden = !isToday;
   el.viewHistory.hidden = isToday;
+  el.btnAdd.hidden = !isToday; // le CTA fixe n'a de sens que sur "Aujourd'hui"
   el.tabs.forEach((t) =>
     t.classList.toggle('is-active', t.dataset.view === view)
   );

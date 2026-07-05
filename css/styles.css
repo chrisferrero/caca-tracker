@@ -104,7 +104,9 @@ body {
 }
 
 .view {
-  padding: 24px 18px calc(104px + var(--safe-bottom));
+  /* Haut : dégage la barre d'onglets fixe. Bas : dégage le CTA fixe. */
+  padding: calc(74px + env(safe-area-inset-top, 0px)) 18px
+    calc(124px + var(--safe-bottom));
 }
 
 /* ===================== BARRE DU HAUT ===================== */
@@ -241,9 +243,15 @@ body {
   margin-top: 5px;
 }
 
-/* ===================== CTA ===================== */
+/* ===================== CTA (fixe en bas) ===================== */
 .cta {
-  width: 100%;
+  position: fixed;
+  bottom: calc(28px + var(--safe-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 36px);
+  max-width: 444px;
+  z-index: 6;
   border: none;
   border-radius: var(--r-pill);
   background: var(--primary);
@@ -262,7 +270,11 @@ body {
 }
 
 .cta:active {
-  transform: scale(0.97);
+  transform: translateX(-50%) scale(0.97);
+}
+
+.cta[hidden] {
+  display: none;
 }
 
 .cta-emoji { font-size: 1.5rem; }
@@ -527,15 +539,15 @@ body {
   text-align: center;
 }
 
-/* ===================== NAVIGATION ===================== */
+/* ===================== NAVIGATION (en haut) ===================== */
 .tabbar {
   position: fixed;
-  bottom: 14px;
+  top: calc(12px + env(safe-area-inset-top, 0px));
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
   max-width: 360px;
-  z-index: 5;
+  z-index: 6;
   display: flex;
   gap: 4px;
   background: rgba(248, 243, 238, 0.1);
@@ -544,7 +556,6 @@ body {
   border: 1px solid rgba(248, 243, 238, 0.15);
   border-radius: var(--r-pill);
   padding: 6px;
-  margin-bottom: var(--safe-bottom);
 }
 
 .tab {

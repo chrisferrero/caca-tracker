@@ -1,5 +1,6 @@
 // Couche UI — rendu et interactions.
 
+import './icon.js';
 import {
   subscribe,
   addEvent,
@@ -8,8 +9,6 @@ import {
   getEventsForDay,
   getLastEventOfDay,
   getHistoryByDay,
-  getStreak,
-  getWeekStatus,
 } from './store.js';
 import {
   dateKey,
@@ -28,8 +27,7 @@ const el = {
   statusIcon: document.getElementById('status-icon'),
   statusTitle: document.getElementById('status-title'),
   statusSub: document.getElementById('status-sub'),
-  streakNum: document.getElementById('streak-num'),
-  weekDots: document.getElementById('week-dots'),
+  heroCount: document.getElementById('hero-count'),
   countNum: document.getElementById('count-num'),
   countHint: document.getElementById('count-hint'),
   btnAdd: document.getElementById('btn-add'),
@@ -72,12 +70,10 @@ function renderToday() {
     el.statusSub.textContent = `Dernier passage à ${formatTime(last.timestamp)}`;
   }
 
-  // Série + compteur
-  el.streakNum.textContent = getStreak();
+  // Compteur du jour, intégré au bloc du haut (visible seulement s'il y a eu ≥1 caca)
+  el.heroCount.hidden = count === 0;
   el.countNum.textContent = count;
-  el.countHint.textContent = count > 1 ? 'passages' : 'passage';
-
-  renderWeekDots();
+  el.countHint.textContent = count > 1 ? 'passages aujourd’hui' : 'passage aujourd’hui';
 
   // Actions
   el.btnUndo.hidden = count === 0;
@@ -94,20 +90,6 @@ function renderToday() {
       <button class="entry-del" type="button" aria-label="Supprimer" data-id="${e.id}">✕</button>
     `;
     el.todayList.appendChild(li);
-  }
-}
-
-// Pastilles de la semaine (lundi → dimanche)
-function renderWeekDots() {
-  el.weekDots.innerHTML = '';
-  for (const day of getWeekStatus()) {
-    const dot = document.createElement('div');
-    dot.className = 'week-dot';
-    if (day.count > 0) dot.classList.add('is-filled');
-    if (day.isToday) dot.classList.add('is-today');
-    if (day.isFuture) dot.classList.add('is-future');
-    dot.innerHTML = `<span class="week-dot-letter">${day.letter}</span>`;
-    el.weekDots.appendChild(dot);
   }
 }
 

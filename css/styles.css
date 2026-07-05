@@ -160,7 +160,6 @@ body {
 
 /* Décalage d'entrée (effet staggered) */
 .hero { animation-delay: 0.02s; }
-.bento { animation-delay: 0.06s; }
 
 .card .label {
   color: var(--ink-dim);
@@ -233,93 +232,36 @@ body {
   margin-top: 5px;
 }
 
-/* ===================== BENTO (série + compteur) ===================== */
-.bento {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--gap);
-  margin-bottom: var(--gap);
-}
-
-.stat-card {
-  padding: 18px;
-}
-
-.stat-card--accent {
-  background: var(--secondary);
-  color: var(--on-dark);
-}
-
-.stat-card--accent .label {
-  color: var(--on-dark-dim);
-}
-
-.stat-num {
-  font-family: var(--font-display);
-  font-size: 2.6rem;
-  font-weight: 700;
-  line-height: 1;
-  margin: 12px 0 8px;
+/* ===================== COMPTEUR (intégré au hero) ===================== */
+.hero-count {
   display: flex;
   align-items: baseline;
-  gap: 4px;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(28, 50, 45, 0.1);
 }
 
-.stat-unit {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--ink-dim);
+.hero-count[hidden] {
+  display: none;
 }
 
-.stat-card--accent .stat-num { color: var(--primary); }
+.hero-count-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--primary);
+}
 
-.stat-emoji { font-size: 1.4rem; }
+.hero.is-done .hero-count-num {
+  color: #b98a1e; /* doré plus contrasté sur le fond clair "fait" */
+}
 
-.stat-hint {
+.hero-count-label {
   font-family: var(--font-body);
-  font-size: 0.9rem;
-  color: var(--on-dark-dim);
-}
-
-/* Pastilles semaine */
-.week-dots {
-  display: flex;
-  gap: 5px;
-  margin-top: 4px;
-}
-
-.week-dot {
-  flex: 1;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: rgba(28, 50, 45, 0.08);
-  transition: transform 0.2s ease;
-}
-
-.week-dot.is-filled {
-  background: var(--primary);
-}
-
-.week-dot.is-today {
-  outline: 2px solid var(--secondary);
-  outline-offset: 1px;
-}
-
-.week-dot.is-future {
-  opacity: 0.4;
-}
-
-.week-dot-letter {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.week-dot.is-filled .week-dot-letter {
-  color: var(--secondary);
+  font-size: 1rem;
+  color: var(--ink-dim);
 }
 
 /* ===================== CTA ===================== */

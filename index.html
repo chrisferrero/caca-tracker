@@ -15,7 +15,9 @@
   />
 
   <link rel="stylesheet" href="css/styles.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐕</text></svg>" />
+  <!-- Favicon (onglet) : émoji caca. L'icône d'écran d'accueil iOS (apple-touch-icon)
+       est générée en PNG au chargement par js/icon.js (rendu couleur natif). -->
+  <link id="favicon" rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💩</text></svg>" />
 </head>
 <body>
   <!-- Décor ambiant (calques derrière le contenu) -->
@@ -36,7 +38,7 @@
         <span class="label topbar-date" id="topbar-date">—</span>
       </header>
 
-      <!-- HERO : l'info la plus importante -->
+      <!-- HERO : l'info la plus importante (statut + compteur du jour) -->
       <section class="card hero" id="status-card">
         <p class="label hero-label" id="hero-label">AUJOURD'HUI</p>
         <div class="hero-main">
@@ -48,22 +50,11 @@
             <p class="hero-sub" id="status-sub"></p>
           </div>
         </div>
+        <div class="hero-count" id="hero-count" hidden>
+          <span class="hero-count-num" id="count-num">0</span>
+          <span class="hero-count-label" id="count-hint">passage aujourd'hui</span>
+        </div>
       </section>
-
-      <!-- BENTO : série + compteur -->
-      <div class="bento">
-        <section class="card stat-card">
-          <p class="label">SÉRIE EN COURS</p>
-          <p class="stat-num"><span id="streak-num">0</span><span class="stat-unit">j</span></p>
-          <div class="week-dots" id="week-dots" aria-label="Cette semaine"></div>
-        </section>
-
-        <section class="card stat-card stat-card--accent">
-          <p class="label">AUJOURD'HUI</p>
-          <p class="stat-num"><span id="count-num">0</span><span class="stat-emoji">💩</span></p>
-          <p class="stat-hint" id="count-hint">passage</p>
-        </section>
-      </div>
 
       <!-- CTA principal -->
       <button id="btn-add" class="cta" type="button">

@@ -1,6 +1,5 @@
 // Couche UI — rendu et interactions.
 
-import './icon.js';
 import {
   subscribe,
   addEvent,

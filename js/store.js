@@ -7,6 +7,7 @@
 import {
   addDoc,
   deleteDoc,
+  updateDoc,
   doc,
   onSnapshot,
   query,
@@ -40,13 +41,21 @@ onSnapshot(
   (err) => console.error('Firestore onSnapshot:', err)
 );
 
-/** Enregistre un caca (par défaut maintenant, ou à une Date précise). */
+/**
+ * Enregistre un caca (par défaut maintenant, ou à une Date précise).
+ * Retourne la référence du document créé (pour y ajouter la position ensuite).
+ */
 export function addEvent(when = new Date()) {
   const date = when instanceof Date ? when : new Date(when);
   return addDoc(eventsCol, {
     timestamp: date.getTime(),
     dateKey: dateKey(date),
   });
+}
+
+/** Ajoute la position GPS à un événement (via sa référence). */
+export function setEventLocation(ref, lat, lng) {
+  return updateDoc(ref, { lat, lng });
 }
 
 /** Enregistre un caca oublié pour AUJOURD'HUI à l'heure hh:mm. */
@@ -93,6 +102,13 @@ export function getHistoryByDay() {
 /** Nombre total d'événements. */
 export function totalCount() {
   return events.length;
+}
+
+/** Événements ayant une position GPS (pour la carte). */
+export function getLocatedEvents() {
+  return events.filter(
+    (e) => typeof e.lat === 'number' && typeof e.lng === 'number'
+  );
 }
 
 /**

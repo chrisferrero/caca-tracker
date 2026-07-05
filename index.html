@@ -14,6 +14,10 @@
     rel="stylesheet"
   />
 
+  <!-- Carte : Leaflet + tuiles OpenStreetMap (gratuit, sans clé) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <link rel="stylesheet" href="css/styles.css" />
   <!-- Icônes : image personnalisée (onglet + écran d'accueil iOS). -->
   <link rel="icon" type="image/png" href="app-icon-180.png" />
@@ -87,6 +91,12 @@
       </div>
 
       <div id="history-content" class="history-content"></div>
+
+      <!-- Carte des lieux de caca -->
+      <section id="map-card" class="card map-card" hidden>
+        <p class="label">CARTE DES CACAS</p>
+        <div id="map" class="map"></div>
+      </section>
 
       <!-- Statistiques globales -->
       <div id="cal-stats" class="cal-stats card" hidden>

@@ -5,8 +5,10 @@ import {
   addEvent,
   addForgottenToday,
   removeEvent,
+  setEventLocation,
   getEventsForDay,
   getLastEventOfDay,
+  getLocatedEvents,
   getStats,
 } from './store.js';
 import {
@@ -37,6 +39,7 @@ const el = {
   calPrev: document.getElementById('cal-prev'),
   calNext: document.getElementById('cal-next'),
   historyContent: document.getElementById('history-content'),
+  mapCard: document.getElementById('map-card'),
   calStats: document.getElementById('cal-stats'),
   statsAvg: document.getElementById('stats-avg'),
   statsSub: document.getElementById('stats-sub'),
@@ -132,6 +135,43 @@ function renderHistory() {
   el.historyContent.innerHTML = html;
 
   renderStats();
+  renderMap();
+}
+
+// --- Carte des lieux de caca (Leaflet + OpenStreetMap) ---
+let map = null;
+let markersLayer = null;
+
+function renderMap() {
+  const pts = getLocatedEvents();
+
+  // Pas de position enregistrée, ou Leaflet non chargé (ex. hors-ligne) → on cache.
+  if (pts.length === 0 || !window.L) {
+    el.mapCard.hidden = true;
+    return;
+  }
+  el.mapCard.hidden = false;
+
+  if (!map) {
+    map = L.map('map', { attributionControl: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap',
+    }).addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
+  }
+
+  markersLayer.clearLayers();
+  const latlngs = [];
+  for (const e of pts) {
+    const when = `${formatLongDate(e.dateKey)} · ${formatTime(e.timestamp)}`;
+    L.marker([e.lat, e.lng]).addTo(markersLayer).bindPopup(when);
+    latlngs.push([e.lat, e.lng]);
+  }
+
+  // Leaflet a besoin de recalculer sa taille quand la vue vient d'être affichée.
+  map.invalidateSize();
+  map.fitBounds(latlngs, { padding: [30, 30], maxZoom: 16 });
 }
 
 // Bloc statistiques globales sous le calendrier.
@@ -195,10 +235,31 @@ function celebrate() {
 // --- Écouteurs ---
 // Les mutations écrivent dans Firestore ; l'affichage se met à jour tout seul
 // via l'abonnement temps réel (subscribe), y compris quand l'autre téléphone agit.
-el.btnAdd.addEventListener('click', () => {
-  addEvent();
+el.btnAdd.addEventListener('click', async () => {
   celebrate();
   if (navigator.vibrate) navigator.vibrate(30);
+
+  // 1) On enregistre le caca tout de suite (sans attendre la géoloc).
+  let ref;
+  try {
+    ref = await addEvent();
+  } catch (e) {
+    console.error('Enregistrement échoué:', e);
+    return;
+  }
+
+  // 2) On tente d'ajouter la position (facultatif : si refusée/indisponible,
+  //    le caca reste enregistré sans coordonnées).
+  if (navigator.geolocation && ref) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        setEventLocation(ref, pos.coords.latitude, pos.coords.longitude).catch(
+          (e) => console.warn('Position non enregistrée:', e)
+        ),
+      (err) => console.warn('Géolocalisation indisponible:', err.message),
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }
 });
 
 el.btnForgot.addEventListener('click', () => {

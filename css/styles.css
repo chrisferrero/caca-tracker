@@ -485,6 +485,29 @@ body {
   font-weight: 800;
 }
 
+/* Carte des lieux de caca */
+.map-card {
+  margin-top: var(--gap);
+  padding: 16px;
+}
+
+.map-card[hidden] {
+  display: none;
+}
+
+.map-card .label {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.map {
+  height: 260px;
+  width: 100%;
+  border-radius: var(--r-control);
+  overflow: hidden;
+  background: rgba(28, 50, 45, 0.06);
+}
+
 /* Bloc statistiques sous le calendrier */
 .cal-stats {
   margin-top: var(--gap);

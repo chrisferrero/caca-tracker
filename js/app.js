@@ -1,6 +1,7 @@
 // Couche UI — rendu et interactions.
 
 import {
+  subscribe,
   addEvent,
   addForgottenToday,
   removeEvent,
@@ -17,7 +18,6 @@ import {
   formatTime,
   relativeDayLabel,
 } from './date.js';
-import { installDemoHelpers } from './demo.js';
 
 // --- Références DOM ---
 const el = {
@@ -174,9 +174,10 @@ function celebrate() {
 }
 
 // --- Écouteurs ---
+// Les mutations écrivent dans Firestore ; l'affichage se met à jour tout seul
+// via l'abonnement temps réel (subscribe), y compris quand l'autre téléphone agit.
 el.btnAdd.addEventListener('click', () => {
   addEvent();
-  renderToday();
   celebrate();
   if (navigator.vibrate) navigator.vibrate(30);
 });
@@ -201,34 +202,31 @@ el.forgotForm.addEventListener('submit', (ev) => {
   const [hh, mm] = value.split(':').map(Number);
   addForgottenToday(hh, mm);
   el.forgotForm.hidden = true;
-  renderToday();
 });
 
 el.btnUndo.addEventListener('click', () => {
   const last = getLastEventOfDay();
-  if (last) {
-    removeEvent(last.id);
-    renderToday();
-  }
+  if (last) removeEvent(last.id);
 });
 
 el.todayList.addEventListener('click', (ev) => {
   const btn = ev.target.closest('.entry-del');
-  if (btn) {
-    removeEvent(btn.dataset.id);
-    renderToday();
-  }
+  if (btn) removeEvent(btn.dataset.id);
 });
 
 el.tabs.forEach((tab) =>
   tab.addEventListener('click', () => switchView(tab.dataset.view))
 );
 
+// Rend la vue actuellement affichée.
+function renderCurrent() {
+  if (el.viewHistory.hidden) renderToday();
+  else renderHistory();
+}
+
 // --- Réinitialisation quotidienne automatique ---
 function checkDayRollover() {
-  if (dateKey() !== currentDayKey && !el.viewToday.hidden) {
-    renderToday();
-  }
+  if (dateKey() !== currentDayKey) renderCurrent();
 }
 setInterval(checkDayRollover, 60 * 1000);
 document.addEventListener('visibilitychange', () => {
@@ -236,5 +234,5 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // --- Démarrage ---
-installDemoHelpers();
-renderToday();
+// L'UI se (re)rend à chaque changement des données temps réel.
+subscribe(renderCurrent);

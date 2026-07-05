@@ -20,10 +20,29 @@ crème ; typos Inter / Playfair Display / JetBrains Mono ; layout bento ; motion
 - **Citation du jour** pour rythmer l'usage.
 - **Réinitialisation quotidienne automatique** : chaque nouvelle journée repart à zéro, sans effacer l'historique.
 - **Historique** : tous les jours passés, groupés par date, du plus récent au plus ancien.
-- **Persistance locale** via `localStorage` — les données restent après fermeture.
+- **Synchronisation temps réel** via **Firebase Firestore** : plusieurs téléphones
+  (ex. deux personnes qui se relaient) partagent le même suivi. Fonctionne aussi
+  hors-ligne (cache local persistant) et se resynchronise au retour du réseau.
 
 > Les polices sont chargées via Google Fonts (nécessite une connexion au premier
 > chargement). Des polices système équivalentes sont utilisées en repli hors-ligne.
+
+## Espace partagé (« foyer ») et lien secret
+
+Les données vivent dans un **foyer** identifié par un secret présent dans l'URL :
+
+```
+https://<site>/#foyer=<identifiant-secret>
+```
+
+- Ouvre le lien secret sur chaque téléphone → tous partagent le même foyer.
+- L'identifiant est mémorisé localement (inutile de le retaper).
+- Sans lien secret, un visiteur obtient automatiquement un **espace privé neuf**
+  (il n'atterrit jamais dans le foyer de quelqu'un d'autre).
+
+La sécurité repose sur ce secret + les **règles Firestore** (accès limité au chemin
+`foyers/{foyerId}/events`, liste des foyers non exposée). La config Firebase dans
+`js/firebase-config.js` est **publique par conception** — ce n'est pas un secret.
 
 ## Lancer le projet
 
@@ -41,37 +60,42 @@ Ou avec Node :
 npx serve .
 ```
 
-> Sur mobile : ouvrir l'URL, puis « Ajouter à l'écran d'accueil » pour un usage plein écran.
-
-## Données de démonstration (optionnel)
-
-Non chargées par défaut. Dans la console du navigateur :
-
-```js
-seedDemo();  // installe quelques jours d'exemple, puis recharger
-clearAll();  // efface tout, puis recharger
-```
+> Sur mobile : ouvrir le lien secret, puis « Ajouter à l'écran d'accueil » pour un usage plein écran.
 
 ## Structure
 
 ```
 caca-tracker/
-├── index.html          # structure des 2 vues + navigation + décor ambiant
-├── css/styles.css      # design « Mindful Moments », mobile-first
+├── index.html               # structure des 2 vues + navigation + décor ambiant
+├── css/styles.css           # design « Mindful Moments », mobile-first
 └── js/
-    ├── date.js         # utilitaires de date (dateKey, formats FR, semaine)
-    ├── storage.js      # persistance localStorage (lecture/écriture)
-    ├── store.js        # logique métier (modèle, streak, semaine, opérations)
-    ├── app.js          # rendu UI + interactions + confettis
-    └── demo.js         # données de démo optionnelles
+    ├── date.js              # utilitaires de date (dateKey, formats FR, semaine)
+    ├── firebase-config.js   # config Firebase (publique)
+    ├── foyer.js             # résolution de l'identifiant de foyer (lien secret)
+    ├── db.js                # init Firebase + Firestore (cache hors-ligne)
+    ├── store.js             # logique métier + synchro temps réel (streak, semaine…)
+    └── app.js               # rendu UI + interactions + confettis
 ```
 
 ## Modèle de données
 
-Un événement :
+Collection Firestore : `foyers/{foyerId}/events`. Chaque événement :
 
 ```js
 { id: string, timestamp: number /* ms */, dateKey: "YYYY-MM-DD" }
 ```
 
 La `dateKey` est calculée en **heure locale** (et non UTC), pour que le changement de jour se fasse bien à minuit local.
+
+## Règles de sécurité Firestore
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /foyers/{foyerId}/events/{eventId} {
+      allow read, write: if true;
+    }
+  }
+}
+```

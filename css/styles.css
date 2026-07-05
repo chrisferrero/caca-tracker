@@ -169,6 +169,7 @@ body {
 .hero {
   margin-bottom: var(--gap);
   border: 1px solid rgba(28, 50, 45, 0.06);
+  box-shadow: none;
   transition: background 0.35s ease;
 }
 
@@ -257,12 +258,7 @@ body {
   justify-content: center;
   gap: 12px;
   cursor: pointer;
-  box-shadow: 0 14px 30px -10px rgba(235, 181, 82, 0.6);
-  transition: transform 0.08s ease, box-shadow 0.25s ease;
-}
-
-.cta:hover {
-  box-shadow: 0 18px 38px -10px rgba(235, 181, 82, 0.75);
+  transition: transform 0.08s ease;
 }
 
 .cta:active {
@@ -393,63 +389,142 @@ body {
   background: rgba(28, 50, 45, 0.1);
 }
 
-/* ===================== HISTORIQUE ===================== */
+/* ===================== HISTORIQUE (calendrier) ===================== */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cal-month {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--on-dark);
+}
+
+.cal-arrow {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(248, 243, 238, 0.15);
+  background: rgba(248, 243, 238, 0.08);
+  color: var(--on-dark);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cal-arrow:hover { background: rgba(248, 243, 238, 0.16); }
+
+.cal-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
 .history-content {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  padding: 16px;
+}
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-wd {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  padding-bottom: 6px;
+}
+
+.cal-cell {
+  aspect-ratio: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--gap);
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: 10px;
 }
 
-.history-day {
-  padding: 18px 20px;
-  animation-delay: calc(var(--i, 0) * 0.05s);
-}
+.cal-cell--empty { visibility: hidden; }
 
-.history-day-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.history-day-title {
+.cal-day {
   font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.history-day-count {
-  font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--ink-dim);
-  background: rgba(235, 181, 82, 0.25);
-  padding: 4px 10px;
-  border-radius: var(--r-pill);
 }
 
-.history-day-times {
+.cal-cell.is-today {
+  background: rgba(28, 50, 45, 0.06);
+}
+
+.cal-cell.is-today .cal-day {
+  color: var(--secondary);
+  font-weight: 800;
+}
+
+/* Bloc statistiques sous le calendrier */
+.cal-stats {
+  margin-top: var(--gap);
+  padding: 20px;
+  text-align: center;
+}
+
+.cal-stats[hidden] {
+  display: none;
+}
+
+.cal-stats-main {
   display: flex;
-  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
   gap: 8px;
 }
 
-.chip {
-  background: rgba(28, 50, 45, 0.06);
-  border-radius: var(--r-pill);
-  padding: 6px 13px;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--ink);
+.cal-stats-num {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #b98a1e;
 }
 
-.empty {
-  color: var(--on-dark-dim);
+.cal-stats-label {
   font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink-dim);
+}
+
+.cal-stats-sub {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--ink-dim);
+  margin-top: 10px;
+}
+
+/* Le rond avec le nombre de cacas du jour */
+.cal-count {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: var(--r-pill);
+  background: var(--primary);
+  color: var(--secondary);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 22px;
   text-align: center;
-  padding: 60px 20px;
-  line-height: 1.8;
 }
 
 /* ===================== NAVIGATION ===================== */

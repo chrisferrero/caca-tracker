@@ -78,6 +78,37 @@ export function currentWeekDays() {
   });
 }
 
+/** Ex. "Juillet 2026" pour l'en-tête du calendrier. */
+export function monthLabel(year, month) {
+  const m = MOIS[month];
+  return `${m.charAt(0).toUpperCase()}${m.slice(1)} ${year}`;
+}
+
+/** Initiales des jours pour l'en-tête du calendrier (lundi → dimanche). */
+export const WEEKDAY_LETTERS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+
+/**
+ * Grille d'un mois : tableau de semaines, chaque semaine = 7 cases.
+ * Une case vaut { day, key } ou null (remplissage avant/après le mois).
+ * Semaine commençant le lundi.
+ */
+export function monthGrid(year, month) {
+  const first = new Date(year, month, 1);
+  const offset = (first.getDay() + 6) % 7; // décalage jusqu'au lundi
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const cells = [];
+  for (let i = 0; i < offset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ day: d, key: dateKey(new Date(year, month, d)) });
+  }
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const weeks = [];
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+  return weeks;
+}
+
 /** Convertit une dateKey "YYYY-MM-DD" (ou une Date) en Date locale. */
 function toDate(input) {
   if (input instanceof Date) return input;

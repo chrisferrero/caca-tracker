@@ -96,6 +96,26 @@ export function totalCount() {
 }
 
 /**
+ * Statistiques globales.
+ * - total : nombre total de cacas enregistrés
+ * - days : nombre de jours suivis (du 1er enregistrement à aujourd'hui, inclus)
+ * - average : moyenne de cacas par jour sur cette période
+ */
+export function getStats() {
+  const total = events.length;
+  if (total === 0) return { total: 0, days: 0, average: 0 };
+
+  const firstTs = Math.min(...events.map((e) => e.timestamp));
+  const first = new Date(firstTs);
+  first.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const days = Math.floor((today - first) / 86400000) + 1;
+  return { total, days, average: total / Math.max(days, 1) };
+}
+
+/**
  * Série en cours : jours consécutifs avec au moins un caca.
  * Si aujourd'hui n'a encore rien, on part de la veille (série non cassée).
  */

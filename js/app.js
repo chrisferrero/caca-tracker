@@ -8,14 +8,16 @@ import {
   removeEvent,
   getEventsForDay,
   getLastEventOfDay,
-  getHistoryByDay,
+  getStats,
 } from './store.js';
 import {
   dateKey,
   formatLongDate,
   formatShortDate,
   formatTime,
-  relativeDayLabel,
+  monthLabel,
+  monthGrid,
+  WEEKDAY_LETTERS,
 } from './date.js';
 
 // --- Références DOM ---
@@ -34,7 +36,13 @@ const el = {
   forgotTime: document.getElementById('forgot-time'),
   timelineCard: document.getElementById('timeline-card'),
   todayList: document.getElementById('today-list'),
+  calMonth: document.getElementById('cal-month'),
+  calPrev: document.getElementById('cal-prev'),
+  calNext: document.getElementById('cal-next'),
   historyContent: document.getElementById('history-content'),
+  calStats: document.getElementById('cal-stats'),
+  statsAvg: document.getElementById('stats-avg'),
+  statsSub: document.getElementById('stats-sub'),
   viewToday: document.getElementById('view-today'),
   viewHistory: document.getElementById('view-history'),
   tabs: document.querySelectorAll('.tab'),
@@ -86,35 +94,74 @@ function renderToday() {
   }
 }
 
-// --- Rendu de la vue « Historique » ---
-function renderHistory() {
-  const days = getHistoryByDay();
-  el.historyContent.innerHTML = '';
+// --- Rendu de la vue « Historique » : calendrier mensuel ---
+// Mois actuellement affiché (par défaut : le mois en cours).
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
 
-  if (days.length === 0) {
-    el.historyContent.innerHTML =
-      '<p class="empty">Aucun enregistrement pour le moment.<br>Les jours passés apparaîtront ici. 🐾</p>';
+function renderHistory() {
+  el.calMonth.textContent = monthLabel(calYear, calMonth);
+
+  // On n'autorise pas d'aller dans le futur (rien à y voir).
+  const now = new Date();
+  el.calNext.disabled =
+    calYear > now.getFullYear() ||
+    (calYear === now.getFullYear() && calMonth >= now.getMonth());
+
+  const todayKey = dateKey();
+  const weeks = monthGrid(calYear, calMonth);
+
+  let html = '<div class="cal-grid">';
+  for (const letter of WEEKDAY_LETTERS) {
+    html += `<div class="cal-wd">${letter}</div>`;
+  }
+  for (const week of weeks) {
+    for (const cell of week) {
+      if (!cell) {
+        html += '<div class="cal-cell cal-cell--empty"></div>';
+        continue;
+      }
+      const count = getEventsForDay(cell.key).length;
+      const cls =
+        'cal-cell' +
+        (cell.key === todayKey ? ' is-today' : '') +
+        (count > 0 ? ' has-events' : '');
+      html += `<div class="${cls}">
+        <span class="cal-day">${cell.day}</span>
+        ${count > 0 ? `<span class="cal-count">${count}</span>` : ''}
+      </div>`;
+    }
+  }
+  html += '</div>';
+  el.historyContent.innerHTML = html;
+
+  renderStats();
+}
+
+// Bloc statistiques globales sous le calendrier.
+function renderStats() {
+  const { total, days, average } = getStats();
+  if (total === 0) {
+    el.calStats.hidden = true;
     return;
   }
+  el.calStats.hidden = false;
+  el.statsAvg.textContent = average.toFixed(1).replace('.', ',');
+  const totalTxt = `${total} caca${total > 1 ? 's' : ''}`;
+  const daysTxt = `${days} jour${days > 1 ? 's' : ''} suivi${days > 1 ? 's' : ''}`;
+  el.statsSub.textContent = `${totalTxt} en tout · ${daysTxt}`;
+}
 
-  days.forEach((day, i) => {
-    const section = document.createElement('section');
-    section.className = 'card history-day';
-    section.style.setProperty('--i', i);
-
-    const times = day.events
-      .map((e) => `<span class="chip">${formatTime(e.timestamp)}</span>`)
-      .join('');
-
-    section.innerHTML = `
-      <div class="history-day-head">
-        <h2 class="history-day-title">${relativeDayLabel(day.dateKey)}</h2>
-        <span class="history-day-count">${day.events.length} 💩</span>
-      </div>
-      <div class="history-day-times">${times}</div>
-    `;
-    el.historyContent.appendChild(section);
-  });
+function shiftMonth(delta) {
+  calMonth += delta;
+  if (calMonth < 0) {
+    calMonth = 11;
+    calYear--;
+  } else if (calMonth > 11) {
+    calMonth = 0;
+    calYear++;
+  }
+  renderHistory();
 }
 
 // --- Navigation ---
@@ -192,6 +239,9 @@ el.todayList.addEventListener('click', (ev) => {
 el.tabs.forEach((tab) =>
   tab.addEventListener('click', () => switchView(tab.dataset.view))
 );
+
+el.calPrev.addEventListener('click', () => shiftMonth(-1));
+el.calNext.addEventListener('click', () => shiftMonth(1));
 
 // Rend la vue actuellement affichée.
 function renderCurrent() {

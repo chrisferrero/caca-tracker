@@ -84,11 +84,27 @@
     <main id="view-history" class="view" aria-label="Historique" hidden>
       <header class="topbar">
         <div class="brand">
-          <span class="brand-mark">📖</span>
+          <span class="brand-mark">📅</span>
           <span class="brand-name">Historique</span>
         </div>
       </header>
+
+      <div class="cal-nav">
+        <button id="cal-prev" class="cal-arrow" type="button" aria-label="Mois précédent">‹</button>
+        <span id="cal-month" class="cal-month">—</span>
+        <button id="cal-next" class="cal-arrow" type="button" aria-label="Mois suivant">›</button>
+      </div>
+
       <div id="history-content" class="history-content"></div>
+
+      <!-- Statistiques globales -->
+      <div id="cal-stats" class="cal-stats card" hidden>
+        <div class="cal-stats-main">
+          <span class="cal-stats-num" id="stats-avg">0</span>
+          <span class="cal-stats-label">cacas / jour en moyenne</span>
+        </div>
+        <p class="cal-stats-sub" id="stats-sub"></p>
+      </div>
     </main>
 
     <!-- ======================= NAVIGATION ======================= -->

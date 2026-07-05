@@ -24,12 +24,9 @@ const el = {
   statusCard: document.getElementById('status-card'),
   heroLabel: document.getElementById('hero-label'),
   heroRing: document.getElementById('hero-ring'),
-  statusIcon: document.getElementById('status-icon'),
+  ringCount: document.getElementById('ring-count'),
   statusTitle: document.getElementById('status-title'),
   statusSub: document.getElementById('status-sub'),
-  heroCount: document.getElementById('hero-count'),
-  countNum: document.getElementById('count-num'),
-  countHint: document.getElementById('count-hint'),
   btnAdd: document.getElementById('btn-add'),
   btnUndo: document.getElementById('btn-undo'),
   btnForgot: document.getElementById('btn-forgot'),
@@ -55,25 +52,21 @@ function renderToday() {
   const count = todays.length;
   const last = getLastEventOfDay();
 
-  // État principal (vert doré si fait, neutre sinon)
+  // Le nombre de cacas du jour, en gros dans le rond.
+  // La couleur du rond indique l'état : doré = fait, neutre = rien encore.
+  el.ringCount.textContent = count;
   if (count === 0) {
     el.statusCard.classList.remove('is-done');
     el.heroRing.classList.remove('is-done');
-    el.statusIcon.textContent = '🐾';
     el.statusTitle.textContent = 'Pas encore aujourd’hui';
     el.statusSub.textContent = 'Aucun caca enregistré pour l’instant.';
   } else {
     el.statusCard.classList.add('is-done');
     el.heroRing.classList.add('is-done');
-    el.statusIcon.textContent = '✅';
     el.statusTitle.textContent = 'Caca déjà fait !';
-    el.statusSub.textContent = `Dernier passage à ${formatTime(last.timestamp)}`;
+    const fois = count > 1 ? `${count} passages · ` : '';
+    el.statusSub.textContent = `${fois}dernier à ${formatTime(last.timestamp)}`;
   }
-
-  // Compteur du jour, intégré au bloc du haut (visible seulement s'il y a eu ≥1 caca)
-  el.heroCount.hidden = count === 0;
-  el.countNum.textContent = count;
-  el.countHint.textContent = count > 1 ? 'passages aujourd’hui' : 'passage aujourd’hui';
 
   // Actions
   el.btnUndo.hidden = count === 0;

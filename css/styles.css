@@ -212,9 +212,17 @@ body {
   100% { transform: scale(1); }
 }
 
-.hero-emoji {
-  font-size: 2.1rem;
+.hero-ring-num {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 800;
   line-height: 1;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-ring.is-done .hero-ring-num {
+  color: var(--secondary);
 }
 
 .hero-title {
@@ -230,38 +238,6 @@ body {
   font-size: 1.02rem;
   color: var(--ink-dim);
   margin-top: 5px;
-}
-
-/* ===================== COMPTEUR (intégré au hero) ===================== */
-.hero-count {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(28, 50, 45, 0.1);
-}
-
-.hero-count[hidden] {
-  display: none;
-}
-
-.hero-count-num {
-  font-family: var(--font-display);
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-  color: var(--primary);
-}
-
-.hero.is-done .hero-count-num {
-  color: #b98a1e; /* doré plus contrasté sur le fond clair "fait" */
-}
-
-.hero-count-label {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  color: var(--ink-dim);
 }
 
 /* ===================== CTA ===================== */

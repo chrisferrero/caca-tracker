@@ -1,0 +1,9 @@
+# Config locale de l'éditeur / preview (non nécessaire au déploiement)
+.claude/
+
+# macOS
+.DS_Store
+
+# Éditeurs
+.vscode/
+.idea/

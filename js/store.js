@@ -115,11 +115,21 @@ export function totalCount() {
   return events.length;
 }
 
-/** Événements ayant une position GPS (pour la carte). */
-export function getLocatedEvents() {
+/** Événements ayant une position GPS (optionnellement filtrés sur un jour). */
+export function getLocatedEvents(key = null) {
   return events.filter(
-    (e) => typeof e.lat === 'number' && typeof e.lng === 'number'
+    (e) =>
+      typeof e.lat === 'number' &&
+      typeof e.lng === 'number' &&
+      (key === null || e.dateKey === key)
   );
+}
+
+/** Total de tous les cacas par type. Retourne { normal, malade }. */
+export function getTotalTypeCounts() {
+  const counts = { normal: 0, malade: 0 };
+  for (const e of events) counts[e.type === 'malade' ? 'malade' : 'normal']++;
+  return counts;
 }
 
 /**

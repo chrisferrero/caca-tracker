@@ -11,6 +11,7 @@ import {
   getStreak,
   getWeekStatus,
   getLocatedEvents,
+  getTotalTypeCounts,
   getStats,
 } from './store.js';
 import {
@@ -50,7 +51,13 @@ const el = {
   calPrev: document.getElementById('cal-prev'),
   calNext: document.getElementById('cal-next'),
   historyContent: document.getElementById('history-content'),
-  mapCard: document.getElementById('map-card'),
+  typeSummary: document.getElementById('type-summary'),
+  sumNormal: document.getElementById('sum-normal'),
+  sumMalade: document.getElementById('sum-malade'),
+  dayDetail: document.getElementById('day-detail'),
+  dayDetailTitle: document.getElementById('day-detail-title'),
+  dayList: document.getElementById('day-list'),
+  mapWrap: document.getElementById('map-wrap'),
   calStats: document.getElementById('cal-stats'),
   statsAvg: document.getElementById('stats-avg'),
   statsSub: document.getElementById('stats-sub'),
@@ -181,8 +188,15 @@ function celebrate() {
 // ===================== VUE HISTORIQUE =====================
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
+let selectedDayKey = dateKey();
 
 function renderHistory() {
+  // Récap global par type
+  const totals = getTotalTypeCounts();
+  el.typeSummary.hidden = totals.normal + totals.malade === 0;
+  el.sumNormal.textContent = totals.normal;
+  el.sumMalade.textContent = totals.malade;
+
   el.calMonth.textContent = monthLabel(calYear, calMonth);
   const now = new Date();
   el.calNext.disabled =
@@ -202,18 +216,48 @@ function renderHistory() {
       const cls =
         'cal-cell' +
         (cell.key === todayKey ? ' is-today' : '') +
+        (cell.key === selectedDayKey ? ' is-selected' : '') +
         (count > 0 ? ' has-events' : '');
-      html += `<div class="${cls}">
+      html += `<button class="${cls}" type="button" data-key="${cell.key}">
         <span class="cal-day">${cell.day}</span>
         ${count > 0 ? `<span class="cal-count">${count}</span>` : ''}
-      </div>`;
+      </button>`;
     }
   }
   html += '</div>';
   el.historyContent.innerHTML = html;
 
+  renderDayDetail(selectedDayKey);
   renderStats();
-  renderMap();
+}
+
+function selectDay(key) {
+  selectedDayKey = key;
+  renderHistory();
+}
+
+// Détail du jour sélectionné : liste (avec type) + carte des points de CE jour.
+function renderDayDetail(key) {
+  const label = formatLongDate(key);
+  el.dayDetailTitle.textContent = label.charAt(0).toUpperCase() + label.slice(1);
+
+  const dayEvents = getEventsForDay(key);
+  el.dayList.innerHTML = '';
+  if (dayEvents.length === 0) {
+    el.dayList.innerHTML = '<li class="day-empty">Aucun caca ce jour.</li>';
+  } else {
+    for (const e of dayEvents) {
+      const type = e.type === 'malade' ? 'malade' : 'normal';
+      const li = document.createElement('li');
+      li.className = 'entry';
+      li.innerHTML = `
+        <span class="entry-time">${formatTime(e.timestamp)}</span>
+        <span class="entry-tag t-${type}">${TYPE_LABEL[type]}</span>
+      `;
+      el.dayList.appendChild(li);
+    }
+  }
+  renderDayMap(key);
 }
 
 function renderStats() {
@@ -231,13 +275,13 @@ function renderStats() {
 
 let map = null;
 let markersLayer = null;
-function renderMap() {
-  const pts = getLocatedEvents();
+function renderDayMap(key) {
+  const pts = getLocatedEvents(key);
   if (pts.length === 0 || !window.L) {
-    el.mapCard.hidden = true;
+    el.mapWrap.hidden = true;
     return;
   }
-  el.mapCard.hidden = false;
+  el.mapWrap.hidden = false;
   if (!map) {
     map = L.map('map', { attributionControl: true });
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -249,8 +293,10 @@ function renderMap() {
   markersLayer.clearLayers();
   const latlngs = [];
   for (const e of pts) {
-    const when = `${formatLongDate(e.dateKey)} · ${formatTime(e.timestamp)}`;
-    L.marker([e.lat, e.lng]).addTo(markersLayer).bindPopup(when);
+    const type = e.type === 'malade' ? 'Malade' : 'Normal';
+    L.marker([e.lat, e.lng])
+      .addTo(markersLayer)
+      .bindPopup(`${formatTime(e.timestamp)} · ${type}`);
     latlngs.push([e.lat, e.lng]);
   }
   map.invalidateSize();
@@ -320,6 +366,12 @@ el.tabs.forEach((tab) =>
 );
 el.calPrev.addEventListener('click', () => shiftMonth(-1));
 el.calNext.addEventListener('click', () => shiftMonth(1));
+
+// Sélection d'un jour dans le calendrier → détail du jour
+el.historyContent.addEventListener('click', (ev) => {
+  const cell = ev.target.closest('.cal-cell[data-key]');
+  if (cell) selectDay(cell.dataset.key);
+});
 
 // Réinitialisation quotidienne automatique
 function checkDayRollover() {

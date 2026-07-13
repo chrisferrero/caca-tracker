@@ -88,6 +88,19 @@
 
     <!-- ======================= HISTORIQUE ======================= -->
     <main id="view-history" class="view" aria-label="Historique" hidden>
+      <!-- Récap global par type -->
+      <div id="type-summary" class="type-summary card" hidden>
+        <div class="ts-item ts--normal">
+          <span class="ts-num" id="sum-normal">0</span>
+          <span class="ts-lbl">Normaux</span>
+        </div>
+        <div class="ts-sep"></div>
+        <div class="ts-item ts--malade">
+          <span class="ts-num" id="sum-malade">0</span>
+          <span class="ts-lbl">Malades</span>
+        </div>
+      </div>
+
       <div class="cal-nav">
         <button id="cal-prev" class="cal-arrow" type="button" aria-label="Mois précédent">‹</button>
         <span id="cal-month" class="cal-month">—</span>
@@ -96,9 +109,14 @@
 
       <div id="history-content" class="history-content"></div>
 
-      <section id="map-card" class="card map-card" hidden>
-        <p class="label">CARTE DES CACAS</p>
-        <div id="map" class="map"></div>
+      <!-- Détail du jour sélectionné -->
+      <section id="day-detail" class="card day-detail">
+        <p class="label" id="day-detail-title">—</p>
+        <ul id="day-list" class="today-list"></ul>
+        <div id="map-wrap" class="map-wrap" hidden>
+          <p class="label map-label">📍 OÙ ?</p>
+          <div id="map" class="map"></div>
+        </div>
       </section>
 
       <div id="cal-stats" class="cal-stats card" hidden>

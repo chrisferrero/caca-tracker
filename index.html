@@ -3,82 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#1C322D" />
-  <title>Journal du chien</title>
-
-  <!-- Typos du design : Inter (display), Playfair Display (body), JetBrains Mono (labels) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@500;600&display=swap"
-    rel="stylesheet"
-  />
+  <meta name="theme-color" content="#FBE4D6" />
+  <title>Caca de Tootsie</title>
 
   <!-- Carte : Leaflet + tuiles OpenStreetMap (gratuit, sans clé) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <link rel="stylesheet" href="css/styles.css" />
-  <!-- Icônes : image personnalisée (onglet + écran d'accueil iOS). -->
   <link rel="icon" type="image/png" href="app-icon-180.png" />
   <link rel="apple-touch-icon" href="app-icon-180.png" />
 </head>
 <body>
-  <!-- Décor ambiant (calques derrière le contenu) -->
   <div class="bg-layer" aria-hidden="true">
     <span class="blob blob-1"></span>
     <span class="blob blob-2"></span>
-    <span class="blob blob-3"></span>
   </div>
 
   <div class="app">
-    <!-- ======================= NAVIGATION (en haut) ======================= -->
+    <!-- ======================= EN-TÊTE ======================= -->
+    <header class="app-header">
+      <div class="app-headings">
+        <h1 class="app-title">Caca de Tootsie</h1>
+        <p class="app-sub">Le suivi des besoins 🐾</p>
+      </div>
+      <img class="avatar" src="avatar.png" alt="Tootsie" />
+    </header>
+
+    <!-- ======================= NAVIGATION ======================= -->
     <nav class="tabbar" aria-label="Navigation principale">
-      <button class="tab is-active" data-view="today" type="button">
-        <span class="tab-icon">🏠</span>
-        <span class="tab-label">Aujourd'hui</span>
-      </button>
-      <button class="tab" data-view="history" type="button">
-        <span class="tab-icon">📅</span>
-        <span class="tab-label">Historique</span>
-      </button>
+      <button class="tab is-active" data-view="today" type="button">Aujourd'hui</button>
+      <button class="tab" data-view="history" type="button">Historique</button>
     </nav>
 
     <!-- ======================= AUJOURD'HUI ======================= -->
     <main id="view-today" class="view" aria-label="Aujourd'hui">
-      <!-- HERO : l'info la plus importante (statut + compteur du jour) -->
-      <section class="card hero" id="status-card">
-        <p class="label hero-label" id="hero-label">AUJOURD'HUI</p>
-        <div class="hero-main">
-          <div class="hero-ring" id="hero-ring">
-            <span class="hero-ring-num" id="ring-count">0</span>
-          </div>
-          <div class="hero-text">
-            <h1 class="hero-title" id="status-title">…</h1>
-            <p class="hero-sub" id="status-sub"></p>
+      <!-- Carte "jours consécutifs" -->
+      <section class="card streak-card">
+        <div class="streak-main">
+          <img class="flame" id="flame" src="icons/flame.svg" alt="" aria-hidden="true" />
+          <div class="streak-text">
+            <span class="streak-num" id="streak-num">0</span>
+            <span class="streak-label">Jours consécutifs</span>
           </div>
         </div>
+        <p class="streak-hint" id="streak-hint">Commencez la série aujourd'hui !</p>
+        <div class="week-row" id="week-row" aria-label="Cette semaine"></div>
       </section>
 
-      <!-- Actions secondaires -->
-      <div class="today-actions">
-        <button id="btn-forgot" class="btn-ghost" type="button">🕐 Ajouter un oubli</button>
-        <button id="btn-undo" class="btn-ghost" type="button" hidden>↩︎ Annuler</button>
-      </div>
-
-      <!-- Panneau : caca oublié -->
-      <form id="forgot-form" class="card forgot-form" hidden>
-        <label for="forgot-time" class="label">HEURE DU CACA OUBLIÉ</label>
-        <div class="forgot-row">
-          <input id="forgot-time" class="forgot-input" type="time" required />
-          <button type="submit" class="forgot-submit">Ajouter</button>
+      <!-- Carte du jour -->
+      <section class="card today-card">
+        <div class="today-head">
+          <span class="label" id="today-label">AUJOURD'HUI</span>
+          <button id="btn-forgot" class="link-btn" type="button">🕐 Ajouter un oubli</button>
         </div>
-      </form>
 
-      <!-- Passages du jour -->
-      <section class="card timeline" id="timeline-card" hidden>
-        <p class="label">PASSAGES DU JOUR</p>
-        <ul id="today-list" class="today-list"></ul>
+        <h2 class="today-title" id="today-title">…</h2>
+
+        <div class="type-counters">
+          <div class="type-counter tc--normal">
+            <span class="tc-num" id="count-normal">0</span>
+            <span class="tc-lbl">Normal</span>
+          </div>
+          <div class="type-counter tc--malade">
+            <span class="tc-num" id="count-malade">0</span>
+            <span class="tc-lbl">Malade</span>
+          </div>
+        </div>
+
+        <!-- Panneau oubli (heure + type) -->
+        <form id="forgot-form" class="forgot-form" hidden>
+          <label for="forgot-time" class="label">HEURE DU CACA OUBLIÉ</label>
+          <input id="forgot-time" class="forgot-input" type="time" required />
+          <p class="forgot-q">Type ?</p>
+          <div class="forgot-types">
+            <button type="button" class="type-btn tb--normal" data-type="normal">🟢 Normal</button>
+            <button type="button" class="type-btn tb--malade" data-type="malade">🤢 Malade</button>
+          </div>
+        </form>
+
+        <ul class="today-list" id="today-list"></ul>
       </section>
     </main>
 
@@ -92,13 +96,11 @@
 
       <div id="history-content" class="history-content"></div>
 
-      <!-- Carte des lieux de caca -->
       <section id="map-card" class="card map-card" hidden>
         <p class="label">CARTE DES CACAS</p>
         <div id="map" class="map"></div>
       </section>
 
-      <!-- Statistiques globales -->
       <div id="cal-stats" class="cal-stats card" hidden>
         <div class="cal-stats-main">
           <span class="cal-stats-num" id="stats-avg">0</span>
@@ -109,11 +111,28 @@
     </main>
   </div>
 
-  <!-- CTA principal, fixe en bas (visible seulement sur la vue Aujourd'hui) -->
+  <!-- ======================= CTA fixe ======================= -->
   <button id="btn-add" class="cta" type="button">
-    <span class="cta-emoji">💩</span>
     <span>Caca fait</span>
+    <img class="cta-emoji" src="icons/caca.svg" alt="" aria-hidden="true" />
   </button>
+
+  <!-- ======================= MODALE : type de caca ======================= -->
+  <div id="type-modal" class="modal" hidden>
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-card" role="dialog" aria-label="Type de caca">
+      <p class="modal-title">Quel type de caca ?</p>
+      <div class="modal-options">
+        <button class="type-btn tb--normal" data-type="normal" type="button">
+          <span class="tb-emoji">🟢</span> Normal
+        </button>
+        <button class="type-btn tb--malade" data-type="malade" type="button">
+          <span class="tb-emoji">🤢</span> Malade
+        </button>
+      </div>
+      <button class="modal-cancel" id="modal-cancel" type="button">Annuler</button>
+    </div>
+  </div>
 
   <script type="module" src="js/app.js"></script>
 </body>

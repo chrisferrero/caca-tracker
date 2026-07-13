@@ -42,14 +42,16 @@ onSnapshot(
 );
 
 /**
- * Enregistre un caca (par défaut maintenant, ou à une Date précise).
+ * Enregistre un caca avec son type ('normal' | 'malade').
+ * Par défaut maintenant, ou à une Date précise.
  * Retourne la référence du document créé (pour y ajouter la position ensuite).
  */
-export function addEvent(when = new Date()) {
+export function addEvent(when = new Date(), type = 'normal') {
   const date = when instanceof Date ? when : new Date(when);
   return addDoc(eventsCol, {
     timestamp: date.getTime(),
     dateKey: dateKey(date),
+    type,
   });
 }
 
@@ -58,11 +60,11 @@ export function setEventLocation(ref, lat, lng) {
   return updateDoc(ref, { lat, lng });
 }
 
-/** Enregistre un caca oublié pour AUJOURD'HUI à l'heure hh:mm. */
-export function addForgottenToday(hh, mm) {
+/** Enregistre un caca oublié pour AUJOURD'HUI à l'heure hh:mm, avec son type. */
+export function addForgottenToday(hh, mm, type = 'normal') {
   const d = new Date();
   d.setHours(hh, mm, 0, 0);
-  return addEvent(d);
+  return addEvent(d, type);
 }
 
 /** Supprime un événement par son id. */
@@ -77,6 +79,15 @@ export function getEventsForDay(key = dateKey()) {
   return events
     .filter((e) => e.dateKey === key)
     .sort((a, b) => b.timestamp - a.timestamp);
+}
+
+/** Compte les cacas d'un jour par type. Retourne { normal, malade }. */
+export function getTypeCountsForDay(key = dateKey()) {
+  const counts = { normal: 0, malade: 0 };
+  for (const e of getEventsForDay(key)) {
+    counts[e.type === 'malade' ? 'malade' : 'normal']++;
+  }
+  return counts;
 }
 
 /** Le dernier événement du jour, ou null. */
